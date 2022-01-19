@@ -13,6 +13,8 @@ contract CryptoChrist is ERC721Enumerable, Ownable {
   uint256 public worldWidth = 10;
   uint256 public worldHeight = 10;
 
+  mapping(uint256 => string) public images;
+
   constructor() ERC721("NFT Svqt", "SVQT") {
       
   }
@@ -21,11 +23,17 @@ contract CryptoChrist is ERC721Enumerable, Ownable {
     return (x << 128) | y;
   }
 
-  function mint(uint256 x, uint256 y) public payable {
+  function mint(uint256 x, uint256 y) external payable {
     uint256 tokenId = getTokenId(x, y);
     require(msg.value >= tokenPrice, "Incorrect ETH sent");
     require(!_exists(tokenId), "Land already minted");
     _safeMint(msg.sender, tokenId);
+  }
+
+  function setImage(uint256 x, uint256 y, string calldata image) external {
+    uint256 tokenId = getTokenId(x, y);
+    require(ownerOf(tokenId) == msg.sender, "Only the owner of the land can set the image");
+    images[tokenId] = image;
   }
 
   function withdraw() external onlyOwner {
