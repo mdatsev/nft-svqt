@@ -1,0 +1,27 @@
+{
+  "name": "nft-svqt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hardhat.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mdatsev/nft-svqt.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mdatsev/nft-svqt/issues"
+  },
+  "homepage": "https://github.com/mdatsev/nft-svqt#readme",
+  "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.4",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.4.2",
+    "chai": "^4.3.4",
+    "dotenv": "^14.2.0",
+    "hardhat": "^2.8.2"
+  }
+}
