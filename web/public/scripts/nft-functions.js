@@ -11,7 +11,6 @@ const config = {
 
 async function getImage(x, y) {
   return fetch(`${config.tokenApiUrl}getImage?x=${x}&y=${y}`).then(res => res.json()).then(resp => { 
-    console.log(resp);
     return resp.image;
   });
 }
@@ -100,3 +99,14 @@ async function mint(x, y) {
     ],
   });
 }
+
+$(() => {
+  $('#connect-wallet-form').on('submit', async (e) => {
+    e.preventDefault();
+    await connectWallet();
+  });
+  $('#mint-form').on('submit', async (e) => {
+    e.preventDefault();
+    await mint();
+  });
+});

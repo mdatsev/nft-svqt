@@ -1,29 +1,45 @@
+const worldSize = 2;
+const imgSize = 100;
+
+function makeImage(src) {
+    return new Promise((resolve, reject) => {
+        let img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
+async function GetWorld() {
+    const tiles = [];
+
+    for (let i = 0; i < worldSize; i++) {
+        tiles.push([]);
+
+        for (let j = 0; j < worldSize; j++) {
+            const img = await getImage(i + 1, j + 1);
+            const link = img ? img : 'images/tile.jpg';
+
+            tiles[i].push(await makeImage(link));
+        }
+    }
+
+    return tiles;
+}
+
 $(async () => {
     const canvas = document.getElementById("world");
     const ctx = canvas.getContext('2d');
-    const worldSize = 15;
-    const imgSize = 100;
-    // const tiles = GetWorld();
+    const tiles = await GetWorld();
 
     ctx.canvas.width  = window.innerWidth - 200;
     ctx.canvas.height = window.innerHeight - 50;
 
     const boundaryX = worldSize*imgSize - ctx.canvas.width;
     const boundaryY = worldSize*imgSize - ctx.canvas.height;
-    let lastX, lastY, dragStart;
+    let lastX = 0, lastY = 0, dragStart;
     let deltaX = 0;
     let deltaY = 0;
-
-    const img = await getImage('images/tile.jpg');
-
-    function getImage(src) {
-        return new Promise((resolve, reject) => {
-            let img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = reject;
-            img.src = src;
-        });
-    }
 
     function redraw() {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -34,7 +50,7 @@ $(async () => {
 
         for (let i = 0; i < worldSize; i++) {
             for (let j = 0; j < worldSize; j++) {
-                ctx.drawImage(img,imgSize*i,imgSize*j,imgSize,imgSize); //tiles[i][j]    
+                ctx.drawImage(tiles[i][j],imgSize*i,imgSize*j,imgSize,imgSize); 
             }
         }
     }
@@ -77,13 +93,47 @@ $(async () => {
         dragStart = false;
     },false);
 
-    canvas.addEventListener('mousewheel',function(evt){
-        console.log(evt);
-        const factor = evt.wheelDelta/100;
+    canvas.addEventListener('contextmenu', async function(evt){
+        x = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+        y = evt.offsetY || (evt.pageY - canvas.offsetTop);
 
-        ctx.scale(factor,factor);
-        redraw();
+        x = parseInt(x / 100) + 1;
+        y = parseInt(y / 100) + 1;
+        
+        $('#parcel-x').text(x);
+        $('#parcel-y').text(y);
+
+        let img = await getImage(x, y);
+
+        if (img) {
+            $('#modal-submit-btn').text('Upload new image');
+            $('#parcel-new-link').show();
+            $('#modal-submit-btn').on('click', async function() {
+                console.log('upload new', x, y)
+                await setImage(x, y, $('#parcel-new-link').val());
+            });
+        } else {
+            img = 'images/tile.jpg';
+            $('#modal-submit-btn').text('Mint parcel');
+            $('#modal-submit-btn').on('click', async function() {
+                console.log('minting', x, y)
+                await mint(x, y);
+            });
+        }
+
+        $('#parcel-img').attr('src', img);
+        $("#tile-modal").modal();
     },false);
+
+    /*canvas.addEventListener('mousewheel',function(evt){
+        console.log(evt);
+        const factor = 1 + 0.05*Math.sign(evt.wheelDelta);
+
+        ctx.translate(lastX,lastY);
+        ctx.scale(factor,factor);
+        ctx.translate(-lastX,-lastY);
+        redraw();
+    },false);*/
 
     redraw();
 });

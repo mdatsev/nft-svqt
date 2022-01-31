@@ -1,3 +1,8 @@
 #world {
     border: 2px solid black;
 }
+
+#parcel-img {
+    margin-bottom: 15px;
+    margin-left: 15px;
+}
