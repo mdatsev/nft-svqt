@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 
 app.get('/getImage', async (req, res) => {
   const { x, y } = req.query;
-  const image = await getParams(+x, +y);
+  const image = await getImage(+x, +y);
 
   res.json({
     image

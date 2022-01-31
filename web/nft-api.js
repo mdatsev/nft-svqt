@@ -8,14 +8,14 @@ const contractAddress = process.env.CONTRACT_ADDRESS;
 const apiKey = process.env.ALCHEMY_API_KEY;
 const network = process.env.NETWORK;
 
-const abi = ['function getImage() external view returns (string memory)'];
+const abi = ['function getImage(uint256 x, uint256 y) external view returns (string memory)'];
 const contract = new ethers.Contract(contractAddress, abi, ethers.Wallet.createRandom().connect(new ethers.providers.AlchemyProvider(network, apiKey)));
 
-let backupValue = 'INVALID';
+let backupValue = {};
 
 async function getImage(x, y) {
+  const cacheKey = `${x}:${y}`;
   try {
-    const cacheKey = `${x}:${y}`;
     const cached = myCache.get(cacheKey);
     if (cached) {
       return cached;
@@ -35,12 +35,15 @@ async function getImage(x, y) {
       image = await newPromise;
     }
 
-    
-    myCache.set(cacheKey, image);
-    return backupValue = image;
+    if (image) {
+      myCache.set(cacheKey, image);
+      return backupValue[cacheKey] = image;
+    } else {
+      throw Error('Image is empty');
+    }
   } catch (e) {
     console.error(e);
-    return backupValue;
+    return backupValue[cacheKey];
   }
 }
 
