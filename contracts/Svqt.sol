@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
@@ -38,6 +38,10 @@ contract Svqt is ERC721Enumerable, Ownable {
     uint256 tokenId = getTokenId(x, y);
     require(ownerOf(tokenId) == msg.sender, "Only the owner of the land can set the image");
     images[tokenId] = image;
+  }
+
+  function getImage(uint256 x, uint256 y) external view returns (string memory) {
+    return images[getTokenId(x, y)];
   }
 
   function tokenURI(uint256 tokenId) public view override(ERC721) returns (string memory) {
