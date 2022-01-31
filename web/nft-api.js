@@ -15,38 +15,39 @@ let backupValue = {};
 
 async function getImage(x, y) {
   const cacheKey = `${x}:${y}`;
-  try {
-    const cached = myCache.get(cacheKey);
-    if (cached) {
-      return cached;
-    }
+  
+  const cached = myCache.get(cacheKey);
+  if (cached) {
+    console.log(`cache hit for ${cacheKey}`);
+    return cached;
+  }
 
+  try {
     const promiseCacheKey = `${x}:${y}:promise`;
     const promise = myCache.get(promiseCacheKey);
 
     let image;
     if (promise) {
+      console.log(`Promise found for ${promiseCacheKey}`);
       image = await promise;
+      console.log(`Awaited promise for ${promiseCacheKey}`);
       myCache.del(promiseCacheKey);
     } else {
-      console.log('sending request to alchemy', new Date().toISOString());
+      console.log(`Sending request to alchemy for ${cacheKey}`, new Date().toISOString());
       const newPromise = contract.getImage(x, y);
       myCache.set(promiseCacheKey, newPromise);
       image = await newPromise;
+      console.log(`Got image for ${cacheKey}`);
     }
-
-    if (image) {
-      myCache.set(cacheKey, image);
-      return backupValue[cacheKey] = image;
-    } else {
-      myCache.set(cacheKey, image);
-      return image;
-    }
+    console.log(`Setting cache for ${cacheKey}`);
+    myCache.set(cacheKey, image);
+    return image;
   } catch (e) {
+    console.log(`Setting cache for ${cacheKey} (error - empty)`);
     myCache.set(cacheKey, '');
 
     console.error(e);
-    return backupValue[cacheKey];
+    return '';
   }
 }
 
