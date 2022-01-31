@@ -2,7 +2,7 @@ require('dotenv').config();
 const ethers = require('ethers');
 const cache = require('node-cache');
 
-const myCache = new cache({ stdTTL: 60, checkperiod: 0, useClones: false });
+const myCache = new cache({ stdTTL: 60000, checkperiod: 0, useClones: false });
 
 const contractAddress = process.env.CONTRACT_ADDRESS;
 const apiKey = process.env.ALCHEMY_API_KEY;
