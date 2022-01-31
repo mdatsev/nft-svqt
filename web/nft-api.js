@@ -39,9 +39,12 @@ async function getImage(x, y) {
       myCache.set(cacheKey, image);
       return backupValue[cacheKey] = image;
     } else {
-      throw Error('Image is empty');
+      myCache.set(cacheKey, image);
+      return image;
     }
   } catch (e) {
+    myCache.set(cacheKey, '');
+
     console.error(e);
     return backupValue[cacheKey];
   }
