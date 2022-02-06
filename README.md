@@ -2,7 +2,9 @@
 
 NFT WORLD is a ...
 
-![nft world logo](https://raw.githubusercontent.com/mdatsev/nft-svqt/main/web/public/images/nft-world-logo.png)
+<p align="center">
+   <img src="https://raw.githubusercontent.com/mdatsev/nft-svqt/main/web/public/images/nft-world-logo.png" alt="nft world logo"/>
+</p>
 
 ## Installation
 
