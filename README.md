@@ -1,25 +1,24 @@
 # NFT WORLD
 
-NFT WORLD is a ...
-
 <p align="center">
    <img src="https://raw.githubusercontent.com/mdatsev/nft-svqt/main/web/public/images/nft-world-logo.png" alt="nft world logo"/>
 </p>
 
-## Installation
+## Описание
+NFT World има за цел да направи притежанието на земя лесно, като оптимизира административната страна на нещата и създаде нова метавселена, от която всеки може да притежава част. Използвайки технологията около NFTs (Non-Fungible Tokens), ние създаваме възможността за прозрачно и сигурно притежание на имоти, имплементирайки я в един виртуален, създаден от нас свят.
 
-Soon
+## Инсталация
 
-## Usage
+1. Инсталирайте NodeJs и npm
+2. Клонирайте репото
+
+## Употреба
+
+Отворете конзолата и напишете
 
 ```python
-using the app
+npm start
 ```
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-## License
+## Лиценз
 [MIT](https://choosealicense.com/licenses/mit/)
