@@ -17,8 +17,7 @@ async function getImage(x, y) {
   const cacheKey = `${x}:${y}`;
   
   const cached = myCache.get(cacheKey);
-  if (cached) {
-    console.log(`cache hit for ${cacheKey}`);
+  if (cached || cached == '') {
     return cached;
   }
 
@@ -28,22 +27,16 @@ async function getImage(x, y) {
 
     let image;
     if (promise) {
-      console.log(`Promise found for ${promiseCacheKey}`);
       image = await promise;
-      console.log(`Awaited promise for ${promiseCacheKey}`);
       myCache.del(promiseCacheKey);
     } else {
-      console.log(`Sending request to alchemy for ${cacheKey}`, new Date().toISOString());
       const newPromise = contract.getImage(x, y);
       myCache.set(promiseCacheKey, newPromise);
       image = await newPromise;
-      console.log(`Got image for ${cacheKey}`);
     }
-    console.log(`Setting cache for ${cacheKey}`);
-    myCache.set(cacheKey, image);
+    myCache.set(cacheKey, image ? image : '');
     return image;
   } catch (e) {
-    console.log(`Setting cache for ${cacheKey} (error - empty)`);
     myCache.set(cacheKey, '');
 
     console.error(e);
