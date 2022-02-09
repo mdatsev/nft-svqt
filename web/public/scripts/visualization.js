@@ -1,4 +1,4 @@
-const worldSize = 2;
+const worldSize = 10;
 const imgSize = 100;
 
 function makeImage(src) {
@@ -12,15 +12,25 @@ function makeImage(src) {
 
 async function GetWorld() {
     const tiles = [];
+    const promises = [];
 
     for (let i = 0; i < worldSize; i++) {
-        tiles.push([]);
-
+        
         for (let j = 0; j < worldSize; j++) {
-            const img = await getImage(i + 1, j + 1);
-            const link = img ? img : 'images/tile.jpg';
+            const promise = getImage(i + 1, j + 1);
+            promises.push(promise);
+            
+        }
+    }
+    
+    const values = await Promise.all(promises);
+    
+    for (let i = 0; i < worldSize; i++) {
+        tiles.push([]);
+        for (let j = 0; j < worldSize; j++) {
+            const link = values[i*worldSize + j] ? values[i*worldSize + j] : 'images/tile.jpg';
 
-            tiles[i].push(await makeImage(link));
+            tiles[i].push(makeImage(link));
         }
     }
 
@@ -41,7 +51,7 @@ $(async () => {
     let deltaX = 0;
     let deltaY = 0;
 
-    function redraw() {
+    async function redraw() {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.save();
         ctx.setTransform(1,0,0,1,0,0);
@@ -50,7 +60,7 @@ $(async () => {
 
         for (let i = 0; i < worldSize; i++) {
             for (let j = 0; j < worldSize; j++) {
-                ctx.drawImage(tiles[i][j],imgSize*i,imgSize*j,imgSize,imgSize); 
+                ctx.drawImage(await tiles[i][j],imgSize*i,imgSize*j,imgSize,imgSize); 
             }
         }
     }
