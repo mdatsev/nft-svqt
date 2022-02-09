@@ -17,7 +17,7 @@
 <body>
     <div class="container-fluid">
         <nav class="navbar navbar-light bg-light justify-content-between">
-            <a class="navbar-brand" href="#">NFT SVQT BEIBII</a>
+            <img src="/images/nft-world-logo.png" height="75px">
             <form class="form-inline" id='connect-wallet-form'>
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Connect</button>
             </form>
@@ -38,15 +38,17 @@
                     <div class="row">
                         <img id='parcel-img' width='200px' height='200px'></img>
                     </div>
-                    <div class="row form-group">
+                    <div class="row form-group" id="parcel-new-link" style="display: none;">
                         <label for='parcel-new-link' class="col-3 col-form-label">New Image Link</label>
                          <div class="col-9">
-                            <input type="text" class="form-control" id="parcel-new-link">
+                            <input type="text" class="form-control" id='parcel-new-link-input'>
                         </div>
+                        <p>Owned by: <span id='owner-addr'></span></p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id='modal-submit-btn'>Mint parcel</button>
+                    <button type="button" class="btn btn-primary" id='modal-mint-btn'>Mint parcel</button>
+                    <button type="button" class="btn btn-primary" id='modal-submit-btn'>Upload new image</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>

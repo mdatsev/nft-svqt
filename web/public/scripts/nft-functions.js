@@ -1,7 +1,7 @@
 const config = {
   tokenApiUrl: 'http://localhost:3000/',
   chainId: '0x4',
-  contractAddress: '0x168709B56bBC9Ab4850b612fD605660853201d5E',
+  contractAddress: '0xC98807d719AFD62a8A591B7E79Bbd1bFbE37E8dA',
   contractABI: [
     'function setImage(uint256 x, uint256 y, string calldata image) external',
     'function mint(uint256 x, uint256 y) external payable',

@@ -28,7 +28,7 @@ async function GetWorld() {
     for (let i = 0; i < worldSize; i++) {
         tiles.push([]);
         for (let j = 0; j < worldSize; j++) {
-            const link = values[i*worldSize + j] ? values[i*worldSize + j] : 'images/tile.jpg';
+            const link = values[i*worldSize + j].img ? values[i*worldSize + j].img : 'images/tile.jpg';
 
             tiles[i].push(makeImage(link));
         }
@@ -113,25 +113,23 @@ $(async () => {
         $('#parcel-x').text(x);
         $('#parcel-y').text(y);
 
-        let img = await getImage(x, y);
+        let data = await getImage(x, y);
 
-        if (img) {
-            $('#modal-submit-btn').text('Upload new image');
+        if (data.addr) {
+            data.img = data.img ? data.img : 'images/tile.jpg';
+
             $('#parcel-new-link').show();
-            $('#modal-submit-btn').on('click', async function() {
-                console.log('upload new', x, y)
-                await setImage(x, y, $('#parcel-new-link').val());
-            });
+            $('#modal-submit-btn').show();
+            $('#modal-mint-btn').hide();
+            $('#owner-addr').text(data.addr);
         } else {
-            img = 'images/tile.jpg';
-            $('#modal-submit-btn').text('Mint parcel');
-            $('#modal-submit-btn').on('click', async function() {
-                console.log('minting', x, y)
-                await mint(x, y);
-            });
+            data.img = 'images/tile.jpg';
+            $('#parcel-new-link').hide();
+            $('#modal-submit-btn').hide();
+            $('#modal-mint-btn').show();
         }
 
-        $('#parcel-img').attr('src', img);
+        $('#parcel-img').attr('src', data.img);
         $("#tile-modal").modal();
     },false);
 
@@ -145,5 +143,12 @@ $(async () => {
         redraw();
     },false);*/
 
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    $('#modal-submit-btn').on('click', async function() {
+        await setImage(x, y, $('#parcel-new-link-input').val());
+    });
+    $('#modal-mint-btn').on('click', async function() {
+        await mint(x, y);
+    });
     redraw();
 });

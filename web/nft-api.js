@@ -8,7 +8,7 @@ const contractAddress = process.env.CONTRACT_ADDRESS;
 const apiKey = process.env.ALCHEMY_API_KEY;
 const network = process.env.NETWORK;
 
-const abi = ['function getImage(uint256 x, uint256 y) external view returns (string memory)'];
+const abi = ['function getImage(uint256 x, uint256 y) external view returns (string memory, address)'];
 const contract = new ethers.Contract(contractAddress, abi, ethers.Wallet.createRandom().connect(new ethers.providers.AlchemyProvider(network, apiKey)));
 
 let backupValue = {};
@@ -33,6 +33,7 @@ async function getImage(x, y) {
       const newPromise = contract.getImage(x, y);
       myCache.set(promiseCacheKey, newPromise);
       image = await newPromise;
+      image = { img: image[0], addr: image[1] };
     }
     myCache.set(cacheKey, image ? image : '');
     return image;
