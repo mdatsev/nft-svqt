@@ -15,6 +15,12 @@ async function getImage(x, y) {
   });
 }
 
+async function getImages(fromX, toX, fromY, toY) {
+  return fetch(`${config.tokenApiUrl}getImages?fromX=${fromX}&toX=${toX}&fromY=${fromY}&toY=${toY}`).then(res => res.json()).then(resp => { 
+    return resp.images;
+  });
+}
+
 async function connectWallet() {
   if (!window.ethereum) {
     alert('Please install MetaMask to interact with this feature');

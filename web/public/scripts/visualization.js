@@ -10,26 +10,18 @@ function makeImage(src) {
     });
 }
 
-async function GetWorld() {
-    const tiles = [];
-    const promises = [];
+const imageUrls = [];
+const owners = [];
 
-    for (let i = 0; i < worldSize; i++) {
-        
-        for (let j = 0; j < worldSize; j++) {
-            const promise = getImage(i + 1, j + 1);
-            promises.push(promise);
-            
-        }
-    }
-    
-    const values = await Promise.all(promises);
-    
+async function GetWorld() {    
+    const values = await getImages(0, worldSize, 0, worldSize);
+    const tiles = [];
     for (let i = 0; i < worldSize; i++) {
         tiles.push([]);
         for (let j = 0; j < worldSize; j++) {
-            const link = values[i*worldSize + j].img ? values[i*worldSize + j].img : 'images/tile.jpg';
-
+            const link = values[0][i*worldSize + j] ? values[0][i*worldSize + j] : 'images/tile.jpg';
+            owners.push(values[1][i*worldSize + j]);
+            imageUrls.push(link);
             tiles[i].push(makeImage(link));
         }
     }
@@ -107,29 +99,30 @@ $(async () => {
         x = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         y = evt.offsetY || (evt.pageY - canvas.offsetTop);
 
-        x = parseInt(x / 100) + 1;
-        y = parseInt(y / 100) + 1;
+        x -= deltaX;
+        y -= deltaY;
+
+        x = parseInt(x / 100);
+        y = parseInt(y / 100);
         
         $('#parcel-x').text(x);
         $('#parcel-y').text(y);
 
-        let data = await getImage(x, y);
+        const tile = imageUrls[x*worldSize + y];
+        const owner = owners[x*worldSize + y];
 
-        if (data.addr) {
-            data.img = data.img ? data.img : 'images/tile.jpg';
-
+        if (owner != '0x0000000000000000000000000000000000000000') {
             $('#parcel-new-link').show();
             $('#modal-submit-btn').show();
             $('#modal-mint-btn').hide();
-            $('#owner-addr').text(data.addr);
+            $('#owner-addr').text(owner);
         } else {
-            data.img = 'images/tile.jpg';
             $('#parcel-new-link').hide();
             $('#modal-submit-btn').hide();
             $('#modal-mint-btn').show();
         }
 
-        $('#parcel-img').attr('src', data.img);
+        $('#parcel-img').attr('src', tile);
         $("#tile-modal").modal();
     },false);
 
