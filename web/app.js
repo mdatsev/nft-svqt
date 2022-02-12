@@ -25,7 +25,7 @@ app.get('/getImage', async (req, res) => {
 
 app.get('/getImages', async (req, res) => {
   const { fromX, fromY, toX, toY } = req.query;
-  const images = await getImages(fromX, fromY, toX, toY);
+  const images = await getImages(fromX, toX, fromY, toY);
 
   res.json({
     images
