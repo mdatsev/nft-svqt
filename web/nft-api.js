@@ -40,7 +40,7 @@ async function getImage(x, y) {
   } catch (e) {
     myCache.set(cacheKey, '');
 
-    console.error(e);
+   //  console.error(e);
     return '';
   }
 }

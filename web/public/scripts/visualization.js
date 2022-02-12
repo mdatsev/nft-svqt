@@ -42,8 +42,8 @@ $(async () => {
     const ctx = canvas.getContext('2d');
     const tiles = await GetWorld();
 
-    ctx.canvas.width  = window.innerWidth - 200;
-    ctx.canvas.height = window.innerHeight - 50;
+    ctx.canvas.width  = window.innerWidth * 0.5;
+    ctx.canvas.height = window.innerHeight - 100;
 
     const boundaryX = worldSize*imgSize - ctx.canvas.width;
     const boundaryY = worldSize*imgSize - ctx.canvas.height;
