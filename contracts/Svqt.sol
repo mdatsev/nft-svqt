@@ -39,9 +39,20 @@ contract Svqt is ERC721Enumerable, Ownable {
     require(ownerOf(tokenId) == msg.sender, "Only the owner of the land can set the image");
     images[tokenId] = image;
   }
-
-  function getImage(uint256 x, uint256 y) external view returns (string memory) {
+    
+  function getImage(uint256 x, uint256 y) public view returns (string memory) {
     return images[getTokenId(x, y)];
+  }
+
+  function getImages(uint256 fromX, uint256 toX, uint256 fromY, uint256 toY) external view returns (string[] memory) {
+    string[] memory result = new string[]((toX - fromX) * (toY - fromY));
+    uint256 i = 0;
+    for (uint256 x = fromX; x < toX; x++) {
+      for (uint256 y = fromY; y < toY; y++) {
+        result[i++] = getImage(x, y);
+      }
+    }
+    return result;
   }
 
   function tokenURI(uint256 tokenId) public view override(ERC721) returns (string memory) {
