@@ -116,6 +116,8 @@ $(async () => {
             $('#modal-submit-btn').show();
             $('#modal-mint-btn').hide();
             $('#owner-addr').text(owner);
+            const id = ethers.BigNumber.from(x).shl(128).or(ethers.BigNumber.from(y)).toString();
+            $('#parcel-link').attr('href', `https://testnets.opensea.io/assets/0x3e0a69948ae8359d16b50d730f3973e999d84824/${id}`);
         } else {
             $('#parcel-new-link').hide();
             $('#modal-submit-btn').hide();
