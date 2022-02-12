@@ -55,7 +55,7 @@ contract Svqt is ERC721Enumerable, Ownable {
   function getImage(uint256 x, uint256 y) public view returns (string memory, address) {
     uint256 id = getTokenId(x, y);
 
-    return (images[id], ownerOf(id));
+    return (images[id], _exists(id) ? ownerOf(id) : address(0));
   }
 
   function getImages(uint256 fromX, uint256 toX, uint256 fromY, uint256 toY) external view returns (string[] memory, address[] memory) {

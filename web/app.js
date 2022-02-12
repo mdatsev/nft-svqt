@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 
-const { getImage } = require('./nft-api');
+const { getImage, getImages } = require('./nft-api');
 
 const app = express();
 const port = 3000;
@@ -20,6 +20,15 @@ app.get('/getImage', async (req, res) => {
 
   res.json({
     image
+  });
+});
+
+app.get('/getImages', async (req, res) => {
+  const { fromX, fromY, toX, toY } = req.query;
+  const images = await getImages(fromX, fromY, toX, toY);
+
+  res.json({
+    images
   });
 });
 
