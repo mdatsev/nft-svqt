@@ -1,31 +1,57 @@
+const worldSize = 10;
+const imgSize = 100;
+
+function makeImage(src) {
+    return new Promise((resolve, reject) => {
+        let img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
+async function GetWorld() {
+    const tiles = [];
+    const promises = [];
+
+    for (let i = 0; i < worldSize; i++) {
+        
+        for (let j = 0; j < worldSize; j++) {
+            const promise = getImage(i + 1, j + 1);
+            promises.push(promise);
+            
+        }
+    }
+    
+    const values = await Promise.all(promises);
+    
+    for (let i = 0; i < worldSize; i++) {
+        tiles.push([]);
+        for (let j = 0; j < worldSize; j++) {
+            const link = values[i*worldSize + j].img ? values[i*worldSize + j].img : 'images/tile.jpg';
+
+            tiles[i].push(makeImage(link));
+        }
+    }
+
+    return tiles;
+}
+
 $(async () => {
     const canvas = document.getElementById("world");
     const ctx = canvas.getContext('2d');
-    const worldSize = 15;
-    const imgSize = 100;
-    // const tiles = GetWorld();
+    const tiles = await GetWorld();
 
-    ctx.canvas.width  = window.innerWidth - 200;
-    ctx.canvas.height = window.innerHeight - 50;
+    ctx.canvas.width  = window.innerWidth * 0.5;
+    ctx.canvas.height = window.innerHeight - 100;
 
     const boundaryX = worldSize*imgSize - ctx.canvas.width;
     const boundaryY = worldSize*imgSize - ctx.canvas.height;
-    let lastX, lastY, dragStart;
+    let lastX = 0, lastY = 0, dragStart;
     let deltaX = 0;
     let deltaY = 0;
 
-    const img = await getImage('images/tile.jpg');
-
-    function getImage(src) {
-        return new Promise((resolve, reject) => {
-            let img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = reject;
-            img.src = src;
-        });
-    }
-
-    function redraw() {
+    async function redraw() {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.save();
         ctx.setTransform(1,0,0,1,0,0);
@@ -34,7 +60,7 @@ $(async () => {
 
         for (let i = 0; i < worldSize; i++) {
             for (let j = 0; j < worldSize; j++) {
-                ctx.drawImage(img,imgSize*i,imgSize*j,imgSize,imgSize); //tiles[i][j]    
+                ctx.drawImage(await tiles[i][j],imgSize*i,imgSize*j,imgSize,imgSize); 
             }
         }
     }
@@ -77,13 +103,52 @@ $(async () => {
         dragStart = false;
     },false);
 
-    canvas.addEventListener('mousewheel',function(evt){
-        console.log(evt);
-        const factor = evt.wheelDelta/100;
+    canvas.addEventListener('contextmenu', async function(evt){
+        x = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+        y = evt.offsetY || (evt.pageY - canvas.offsetTop);
 
-        ctx.scale(factor,factor);
-        redraw();
+        x = parseInt(x / 100) + 1;
+        y = parseInt(y / 100) + 1;
+        
+        $('#parcel-x').text(x);
+        $('#parcel-y').text(y);
+
+        let data = await getImage(x, y);
+
+        if (data.addr) {
+            data.img = data.img ? data.img : 'images/tile.jpg';
+
+            $('#parcel-new-link').show();
+            $('#modal-submit-btn').show();
+            $('#modal-mint-btn').hide();
+            $('#owner-addr').text(data.addr);
+        } else {
+            data.img = 'images/tile.jpg';
+            $('#parcel-new-link').hide();
+            $('#modal-submit-btn').hide();
+            $('#modal-mint-btn').show();
+        }
+
+        $('#parcel-img').attr('src', data.img);
+        $("#tile-modal").modal();
     },false);
 
+    /*canvas.addEventListener('mousewheel',function(evt){
+        console.log(evt);
+        const factor = 1 + 0.05*Math.sign(evt.wheelDelta);
+
+        ctx.translate(lastX,lastY);
+        ctx.scale(factor,factor);
+        ctx.translate(-lastX,-lastY);
+        redraw();
+    },false);*/
+
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    $('#modal-submit-btn').on('click', async function() {
+        await setImage(x, y, $('#parcel-new-link-input').val());
+    });
+    $('#modal-mint-btn').on('click', async function() {
+        await mint(x, y);
+    });
     redraw();
 });

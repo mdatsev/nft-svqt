@@ -20,6 +20,18 @@ contract Svqt is ERC721Enumerable, Ownable {
       
   }
 
+    function setPrice(uint256 val) external onlyOwner {
+        tokenPrice = val;
+    }
+
+    function setWorldWidth(uint256 val) external onlyOwner {
+        worldWidth = val;
+    }
+
+    function setWorldHeight(uint256 val) external onlyOwner {
+        worldHeight = val;
+    }
+
   function getTokenId(uint256 x, uint256 y) public pure returns (uint256) {
     return (x << 128) | y;
   }
@@ -39,9 +51,11 @@ contract Svqt is ERC721Enumerable, Ownable {
     require(ownerOf(tokenId) == msg.sender, "Only the owner of the land can set the image");
     images[tokenId] = image;
   }
-    
-  function getImage(uint256 x, uint256 y) public view returns (string memory) {
-    return images[getTokenId(x, y)];
+
+  function getImage(uint256 x, uint256 y) external view returns (string memory, address) {
+    uint256 id = getTokenId(x, y);
+
+    return (images[id], ownerOf(id));
   }
 
   function getImages(uint256 fromX, uint256 toX, uint256 fromY, uint256 toY) external view returns (string[] memory) {

@@ -1,17 +1,69 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.5.4/ethers.umd.min.js" integrity="sha512-xmbPx0riylir51GhTZCFd20yS7NYZNpfDTbEWBjDRzs+UaGb2RyjtASTVtF2ydQWp3xkso9j4sJj39PdSH8/EA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.5.4/ethers.umd.min.js"
+        integrity="sha512-xmbPx0riylir51GhTZCFd20yS7NYZNpfDTbEWBjDRzs+UaGb2RyjtASTVtF2ydQWp3xkso9j4sJj39PdSH8/EA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="/scripts/nft-functions.js" type="text/javascript"></script>
     <script src="/scripts/visualization.js" type="text/javascript"></script>
     <link rel="stylesheet" href="/css/style.css" />
 </head>
+
 <body>
     <div class="container-fluid">
-        <h1>NFT SVQT BEIBI</h1>
-        <canvas id="world"></canvas>
+        <nav class="navbar navbar-light bg-light justify-content-between">
+            <img src="/images/nft-world-logo.png" height="75px">
+            <form class="form-inline" id='connect-wallet-form'>
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Connect</button>
+            </form>
+        </nav>
+        <div class='row'>
+            <div class="col">
+                <canvas id="world"></canvas>
+            </div>
+            <div class="col">
+                <p>Pan with mouse. Right click for parcel details.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id='tile-modal' class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Parcel coordinates - x: <span id='parcel-x'></span> y: <span
+                            id='parcel-y'></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <img id='parcel-img' width='200px' height='200px'></img>
+                    </div>
+                    <div class="row form-group" id="parcel-new-link" style="display: none;">
+                        <label for='parcel-new-link' class="col-3 col-form-label">New Image Link</label>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id='parcel-new-link-input'>
+                        </div>
+                        <p>Owned by: <span id='owner-addr'></span></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id='modal-mint-btn'>Mint parcel</button>
+                    <button type="button" class="btn btn-primary" id='modal-submit-btn'>Upload new image</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
+
 </html>

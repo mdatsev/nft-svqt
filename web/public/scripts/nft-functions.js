@@ -1,7 +1,7 @@
 const config = {
   tokenApiUrl: 'http://localhost:3000/',
   chainId: '0x4',
-  contractAddress: '0x168709B56bBC9Ab4850b612fD605660853201d5E',
+  contractAddress: '0xC98807d719AFD62a8A591B7E79Bbd1bFbE37E8dA',
   contractABI: [
     'function setImage(uint256 x, uint256 y, string calldata image) external',
     'function mint(uint256 x, uint256 y) external payable',
@@ -11,7 +11,6 @@ const config = {
 
 async function getImage(x, y) {
   return fetch(`${config.tokenApiUrl}getImage?x=${x}&y=${y}`).then(res => res.json()).then(resp => { 
-    console.log(resp);
     return resp.image;
   });
 }
@@ -100,3 +99,14 @@ async function mint(x, y) {
     ],
   });
 }
+
+$(() => {
+  $('#connect-wallet-form').on('submit', async (e) => {
+    e.preventDefault();
+    await connectWallet();
+  });
+  $('#mint-form').on('submit', async (e) => {
+    e.preventDefault();
+    await mint();
+  });
+});
