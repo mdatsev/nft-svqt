@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Image, Modal, Button, Header } from 'semantic-ui-react';
 import { mint } from '../../services/ether-api';
+import Confetti from 'react-confetti';
+import useWindowSize from 'react-use-window-size';
 
 import './index.css';
 
@@ -18,12 +20,22 @@ const unhoveredStyle = {
     zIndex: 1,
 }
 
-
+function getWindowDimensions() {
+    const { innerWidth: width, innerHeight: height } = window;
+    return {
+        width,
+        height
+    };
+}
 
 const ParcelBlock = ({ x, y }) => {
 
+    const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+    const [windowSize, setWindowSize] = React.useState();
+
     const [isHovering, setIsHovering] = React.useState(false);
     const [modalOpen, setModalOpen] = React.useState(false);
+    const [confetti, setConfetti] = React.useState(false);
 
     const handleMouseEnter = () => {
         setIsHovering(true);
@@ -37,8 +49,24 @@ const ParcelBlock = ({ x, y }) => {
         setModalOpen(true);
     }
 
+    useEffect(() => {
+        function handleResize() {
+            setWindowDimensions(getWindowDimensions());
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
         <>
+            {confetti ?
+                <Confetti
+                    width={windowDimensions.width/2}
+                    height={windowDimensions.height/2}
+                    style={{ position: 'absolute', top: '0', left: '0' }}
+                /> :
+                null}
             <Modal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
@@ -54,6 +82,10 @@ const ParcelBlock = ({ x, y }) => {
                         Close
                     </Button>
                     <Button color='green' onClick={() => {
+                        setConfetti(true);
+                        setTimeout(function () {
+                            setConfetti(false);
+                        }, 5000);
                         setModalOpen(false);
                         mint(x, y);
                     }}>
