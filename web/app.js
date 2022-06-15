@@ -4,7 +4,7 @@ const express = require('express');
 const { getImage, getImages } = require('./nft-api');
 
 const app = express();
-const port = 3000;
+const port = 5000;
 
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
