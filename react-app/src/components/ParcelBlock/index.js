@@ -48,10 +48,7 @@ const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
 
 
     const isMintedByMe = (x, y) => {
-        console.log(world[x][y].owner, wallet);
-        console.log(!world)
         if (!world) return false;
-        console.log(world[x][y].owner == wallet)
         if (world[x][y]) return world[x][y].owner.toLowerCase() == wallet.toLowerCase();
     }
 
@@ -85,12 +82,10 @@ const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
     const [imageFile, setImageFile] = React.useState();
     const setImageFileWrapper = event => {
         if (event.target.files && event.target.files[0]) {
-          let img = event.target.files[0];
-          console.log(img);
-          console.log(URL.createObjectURL(img));
-          setImageFile(event.target.files[0]);//URL.createObjectURL(img));      
+            let img = event.target.files[0];
+            setImageFile(event.target.files[0]);//URL.createObjectURL(img));      
         }
-      }
+    }
 
     return (
         <>
@@ -119,7 +114,7 @@ const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
                             </Button>
                             <Button color='green' onClick={async () => {
                                 setModalOpen(false);
-                                if(await mint(x, y)) {
+                                if (await mint(x, y)) {
                                     setConfetti(true);
                                     setTimeout(function () {
                                         setConfetti(false);
@@ -138,7 +133,7 @@ const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
                                 <p>
                                     Welcome to your property! Choose image for your property!
                                 </p>
-                                <form class="setImage-form">
+                                <form className="setImage-form">
                                     <input onChange={setImageFileWrapper} type="file" accept="image/png, image/jpeg"></input>
                                 </form>
                             </Modal.Content>
@@ -158,16 +153,12 @@ const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
                             <Header content={`Parcel coordinates - x: ${x} y: ${y}`} />
                             <Modal.Content>
                                 <p>
-                                    This is someone else's propety!
+                                    Oops. This is someone else's propety!
                                 </p>
                             </Modal.Content>
                             <Modal.Actions>
                                 <Button color='red' onClick={() => setModalOpen(false)}>
                                     Close
-                                </Button>
-                                <Button color='green' onClick={() => {
-                                }}>
-                                    No action here
                                 </Button>
                             </Modal.Actions>
                         </>
