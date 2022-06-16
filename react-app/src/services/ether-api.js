@@ -61,7 +61,7 @@ async function getImages(fromX, toX, fromY, toY) {
 export const config = {
     tokenApiUrl: 'http://localhost:5000/',
     chainId: '0x4',
-    contractAddress: '0x3e0A69948AE8359d16B50D730f3973E999d84824',
+    contractAddress: '0xD7A447D38Eb609409a73075f7aa20f3B1CEf77f6',
     contractABI: [
         'function setImage(uint256 x, uint256 y, string calldata image) external',
         'function mint(uint256 x, uint256 y) external payable',
@@ -179,7 +179,7 @@ async function getWorld() {
             const link = values[0][i * worldSize + j] ? values[0][i * worldSize + j] : 'images/tile.jpg';
             owners.push(values[1][i * worldSize + j]);
             imageUrls.push(link);
-            tiles[i].push(makeImage(link));
+            tiles[i].push({ image: link, owner: values[1][i * worldSize + j] });
         }
     }
 
