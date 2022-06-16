@@ -1,5 +1,5 @@
 const config = {
-  tokenApiUrl: 'http://localhost:3000/',
+  tokenApiUrl: 'http://localhost:5000/',
   chainId: '0x4',
   contractAddress: '0x3e0A69948AE8359d16B50D730f3973E999d84824',
   contractABI: [
