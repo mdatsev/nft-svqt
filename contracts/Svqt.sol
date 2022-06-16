@@ -6,15 +6,27 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
+
 
 contract Svqt is ERC721Enumerable, Ownable {
   using Strings for uint256;
 
   uint256 public tokenPrice = 0.01 ether;
+  uint256 public whitelistPrice = 0.005 ether;
   uint256 public worldWidth = 10;
   uint256 public worldHeight = 10;
 
   mapping(uint256 => string) public images;
+  mapping(address => uint) public balanceReceived;
+  bytes32 public whitelistRoot;
+
+  modifier isWhitelisted(address target, bytes32[] proof) {
+    bytes32 leaf = keccak256(abi.encodePacked(target));
+    MerkleProof.verify(proof, whitelistRoot, leaf);
+    _;
+  }
 
   constructor() ERC721("NFT Svqt", "SVQT") {
       
@@ -42,6 +54,13 @@ contract Svqt is ERC721Enumerable, Ownable {
   function mint(uint256 x, uint256 y) external payable {
     uint256 tokenId = getTokenId(x, y);
     require(msg.value >= tokenPrice, "Incorrect ETH sent");
+    require(!_exists(tokenId), "Land already minted");
+    _safeMint(msg.sender, tokenId);
+  }
+
+  function whitelistMint(uint256 x, uint256 y) external payable isWhitelisted {
+    uint256 tokenId = getTokenId(x, y);
+    require(msg.value >= whitelistPrice, "Incorrect ETH sent");
     require(!_exists(tokenId), "Land already minted");
     _safeMint(msg.sender, tokenId);
   }
@@ -85,7 +104,20 @@ contract Svqt is ERC721Enumerable, Ownable {
     return string(abi.encodePacked('data:application/json;utf8,', json));
   }
 
+  function setWhitelistRoot(bytes32 val) external onlyOwner {
+    whitelistRoot = val;
+  }
+
   function withdraw() external onlyOwner {
     require(payable(msg.sender).send(address(this).balance));
+  }
+
+  receive() external payable {
+    require(balanceReceived[msg.sender] + msg.value >= balanceReceived[msg.sender]);
+    balanceReceived[msg.sender] += msg.value;
+  }
+
+  fallback() external {
+    require(false, "Invalid calldata.");
   }
 }
