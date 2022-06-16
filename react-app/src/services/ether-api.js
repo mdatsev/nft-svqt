@@ -1,5 +1,7 @@
 const ethers = require('ethers');
 const cache = require('node-cache');
+const keccak256 = require('keccak256');
+const { MerkleTree } = require('merkletreejs');
 
 const myCache = new cache({ stdTTL: 60000, checkperiod: 0, useClones: false });
 
@@ -61,12 +63,15 @@ async function getImages(fromX, toX, fromY, toY) {
 export const config = {
     tokenApiUrl: 'http://localhost:5000/',
     chainId: '0x4',
-    contractAddress: '0x3e0A69948AE8359d16B50D730f3973E999d84824',
+    contractAddress: '0xD7A447D38Eb609409a73075f7aa20f3B1CEf77f6',
     contractABI: [
         'function setImage(uint256 x, uint256 y, string calldata image) external',
         'function mint(uint256 x, uint256 y) external payable',
         'function tokenPrice() external view returns (uint256)',
-    ]
+    ],
+    whitelist: [
+        "", ""
+    ],
 };
 
 export async function connectWallet() {
@@ -128,32 +133,61 @@ async function setImage(x, y, image) {
 
 
 
-export async function mint(x, y) {
+export async function mint(x, y, isWhitelist=false) {
     await connectWallet();
 
-    const contract = new ethers.Contract(
-        config.contractAddress,
-        config.contractABI,
-        new ethers.providers.Web3Provider(window.ethereum)
-    );
+    try {
+        const contract = new ethers.Contract(
+            config.contractAddress,
+            config.contractABI,
+            new ethers.providers.Web3Provider(window.ethereum)
+        );
 
-    const iface = new ethers.utils.Interface(config.contractABI);
-    const params = iface.encodeFunctionData('mint', [
-        ethers.utils.hexlify(x),
-        ethers.utils.hexlify(y)
-    ]);
+        const iface = new ethers.utils.Interface(config.contractABI);
+        let params;
+        if (isWhitelist) {
+            const claimingAddress = keccak256(window.ethereum.selectedAddress);
+            const leaftNodes = config.whitelist.map(addr => keccak256(addr));
+            const merkle = new MerkleTree(leaftNodes, keccak256, { sortPairs: true });
+            const rootHash = merkle.getHexRoot();
+            console.log(rootHash);
+            if (await contract.whitelistRoot() != rootHash) {
+                return alert('Whitelist does not match.');
+            }
 
-    const txHash = await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [
-            {
-                from: window.ethereum.selectedAddress,
-                to: config.contractAddress,
-                value: (await contract.tokenPrice()).toHexString(),
-                data: params,
-            },
-        ],
-    });
+            params = iface.encodeFunctionData('whitelistMint', [ ethers.utils.hexlify(x), ethers.utils.hexlify(y), merkle.getHexProof(claimingAddress)]);
+        } else {
+            params = iface.encodeFunctionData('mint', [
+                ethers.utils.hexlify(x),
+                ethers.utils.hexlify(y)
+            ]);
+        }
+
+        const txHash = await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [
+                {
+                    from: window.ethereum.selectedAddress,
+                    to: config.contractAddress,
+                    value: (await contract.tokenPrice()).toHexString(),
+                    data: params,
+                },
+            ],
+        });
+        try {
+            const tx = await (new ethers.providers.Web3Provider(window.ethereum)).getTransaction(txHash);
+            const txReceipt = await tx.wait();
+            console.log(txReceipt);
+        } catch (err) {
+            console.log(err);
+            return alert('There was an error with your transaction. Please try again.');
+        }
+    } catch (e) {
+        console.log(e);
+        return alert(e.stack);
+    }
+
+    return true;
 }
 const worldSize = 10;
 const imgSize = 100;

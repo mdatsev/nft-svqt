@@ -81,13 +81,14 @@ const ParcelBlock = ({ x, y }) => {
                     <Button color='red' onClick={() => setModalOpen(false)}>
                         Close
                     </Button>
-                    <Button color='green' onClick={() => {
-                        setConfetti(true);
-                        setTimeout(function () {
-                            setConfetti(false);
-                        }, 5000);
+                    <Button color='green' onClick={async () => {
                         setModalOpen(false);
-                        mint(x, y);
+                        if(await mint(x, y)) {
+                            setConfetti(true);
+                            setTimeout(function () {
+                                setConfetti(false);
+                            }, 5000);
+                        }
                     }}>
                         Mint
                     </Button>
