@@ -64,8 +64,8 @@ async function getImages(fromX, toX, fromY, toY) {
 
 export const config = {
     tokenApiUrl: 'http://localhost:5000/',
-    chainId: '0x4',
-    contractAddress: '0xD7A447D38Eb609409a73075f7aa20f3B1CEf77f6',
+    chainId: '0x3',
+    contractAddress: '0x38413Fe8e5Fb0612B312cde7352c664c00E1a3e2',
     contractABI: [
         'function setImage(uint256 x, uint256 y, string calldata image) external',
         'function mint(uint256 x, uint256 y) external payable',
