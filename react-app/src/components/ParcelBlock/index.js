@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from 'react';
 
-import { Image, Modal, Button, Header } from 'semantic-ui-react';
+import { Modal, Button, Header, Icon } from 'semantic-ui-react';
 import { mint } from '../../services/ether-api';
 import Confetti from 'react-confetti';
-import useWindowSize from 'react-use-window-size';
+import _ from 'lodash';
 
 import './index.css';
 
 const hoveredStyle = {
-    display: 'inline',
+    display: 'inline-block',
     backgroundColor: '#fff',
     boxShadow: '0px 0px 80px 40px #0ff',
     position: 'relative',
+    maxWidth: '80px',
+    height: '80px',
     zIndex: 999,
 }
 
 const unhoveredStyle = {
-    display: 'inline',
+    display: 'inline-block',
+    maxWidth: '80px',
+    height: '80px',
     zIndex: 1,
 }
 
@@ -28,7 +32,12 @@ function getWindowDimensions() {
     };
 }
 
-const ParcelBlock = ({ x, y }) => {
+
+const mintedByMeStyle = { padding: 0, margin: '0%', width: '80px', height: '80px', display: 'inline', borderStyle: 'solid', borderWidth: '1px', borderColor: 'green' }
+const mintedStyle = { padding: 0, margin: '0%', width: '80px', height: '80px', display: 'inline' }
+const unmintedStyle = { padding: 0, margin: '0%', width: '80px', height: '80px', display: 'inline', opacity: '90%' }
+
+const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
 
     const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
     const [windowSize, setWindowSize] = React.useState();
@@ -36,6 +45,21 @@ const ParcelBlock = ({ x, y }) => {
     const [isHovering, setIsHovering] = React.useState(false);
     const [modalOpen, setModalOpen] = React.useState(false);
     const [confetti, setConfetti] = React.useState(false);
+
+
+    const isMintedByMe = (x, y) => {
+        console.log(world[x][y].owner, wallet);
+        console.log(!world)
+        if (!world) return false;
+        console.log(world[x][y].owner == wallet)
+        if (world[x][y]) return world[x][y].owner.toLowerCase() == wallet.toLowerCase();
+    }
+
+    const isNotMinted = (x, y) => {
+        if (!world) return true;
+        if (!world[1]) return true;
+        return world[x][y].owner == '0x0000000000000000000000000000000000000000'
+    }
 
     const handleMouseEnter = () => {
         setIsHovering(true);
@@ -62,8 +86,8 @@ const ParcelBlock = ({ x, y }) => {
         <>
             {confetti ?
                 <Confetti
-                    width={windowDimensions.width/2}
-                    height={windowDimensions.height/2}
+                    width={windowDimensions.width / 2}
+                    height={windowDimensions.height / 2}
                     style={{ position: 'absolute', top: '0', left: '0' }}
                 /> :
                 null}
@@ -71,31 +95,100 @@ const ParcelBlock = ({ x, y }) => {
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
             >
-                <Header content={`Parcel coordinates - x: ${x} y: ${y}`} />
-                <Modal.Content>
-                    <p>
-                        Want to mint?
-                    </p>
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button color='red' onClick={() => setModalOpen(false)}>
-                        Close
-                    </Button>
-                    <Button color='green' onClick={async () => {
-                        setModalOpen(false);
-                        if(await mint(x, y)) {
-                            setConfetti(true);
-                            setTimeout(function () {
-                                setConfetti(false);
-                            }, 5000);
-                        }
-                    }}>
-                        Mint
-                    </Button>
-                </Modal.Actions>
+                {isNotMinted(x, y) ?
+                    <>
+                        <Header content={`Parcel coordinates - x: ${x} y: ${y}`} />
+                        <Modal.Content>
+                            <p>
+                                Want to mint?
+                            </p>
+                        </Modal.Content>
+                        <Modal.Actions>
+                            <Button color='red' onClick={() => setModalOpen(false)}>
+                                Close
+                            </Button>
+                            <Button color='green' onClick={() => {
+                                setModalOpen(false);
+                                if(await mint(x, y)) {
+                                    setConfetti(true);
+                                    setTimeout(function () {
+                                        setConfetti(false);
+                                    }, 5000);
+                                }
+                            }}>
+                                Mint
+                            </Button>
+                        </Modal.Actions>
+                    </>
+                    :
+                    isMintedByMe(x, y) ?
+                        <>
+                            <Header content={`Parcel coordinates - x: ${x} y: ${y}`} />
+                            <Modal.Content>
+                                <p>
+                                    Welcome to your property!
+                                </p>
+                            </Modal.Content>
+                            <Modal.Actions>
+                                <Button color='red' onClick={() => setModalOpen(false)}>
+                                    Close
+                                </Button>
+                                <Button color='green' onClick={() => {
+                                    //update image here
+                                }}>
+                                    Save Changes
+                                </Button>
+                            </Modal.Actions>
+                        </>
+                        :
+                        <>
+                            <Header content={`Parcel coordinates - x: ${x} y: ${y}`} />
+                            <Modal.Content>
+                                <p>
+                                    This is someone else's propety!
+                                </p>
+                            </Modal.Content>
+                            <Modal.Actions>
+                                <Button color='red' onClick={() => setModalOpen(false)}>
+                                    Close
+                                </Button>
+                                <Button color='green' onClick={() => {
+                                }}>
+                                    No action here
+                                </Button>
+                            </Modal.Actions>
+                        </>
+                }
             </Modal>
             <span onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleOnClick} style={isHovering ? hoveredStyle : unhoveredStyle}>
-                <Image src='/images/tile.jpg' style={{ padding: 0, margin: '0%', width: '80px', height: '80px', display: 'inline' }} />
+                {isNotMinted(x, y) ?
+                    <div style={{
+                        backgroundImage: `url(images/tile.jpg)`,
+                        backgroundSize: '80px 80px',
+                        backgroundRepeat: 'no-repeat',
+                        width: '80px',
+                        height: '80px',
+                        margin: '0px',
+                        opacity: '93%'
+                    }} />
+                    :
+                    <div style={{
+                        backgroundImage: `${world[x][y].image ? world[x][y].image : 'url(images/tile.jpg)'}`,
+                        backgroundSize: '80px 80px',
+                        backgroundRepeat: 'no-repeat',
+                        width: '80px',
+                        height: '80px',
+                        margin: '0px',
+                    }} >
+                        {
+                            isMintedByMe(x, y) ?
+                                <Icon inverted color='yellow' name='certificate' style={{ position: 'absolute' }} />
+                                :
+                                <Icon inverted color='black' name='user secret' style={{ position: 'absolute' }} />
+                        }
+                    </div>
+                }
+
             </span>
         </>
     )

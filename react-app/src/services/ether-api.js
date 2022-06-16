@@ -213,7 +213,7 @@ async function getWorld() {
             const link = values[0][i * worldSize + j] ? values[0][i * worldSize + j] : 'images/tile.jpg';
             owners.push(values[1][i * worldSize + j]);
             imageUrls.push(link);
-            tiles[i].push(makeImage(link));
+            tiles[i].push({ image: link, owner: values[1][i * worldSize + j] });
         }
     }
 
