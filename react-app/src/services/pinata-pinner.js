@@ -1,17 +1,16 @@
 //imports needed for this function
 
-import fetch, { FormData, fileFromSync } from 'node-fetch';
-import fs from 'fs';
-import path from 'path';
+//import fetch, { FormData, fileFromSync } from 'node-fetch';
+//import path from 'path';
 
 const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
 // const url = `https://requestbin.io/1ez5gkz1`;
 
-async function pinFile(image, name) {
+export async function pinFile(image, name) {
   //we gather the files from a local directory in this example, but a valid readStream is all that's needed for each file in the directory.
 
   let formData = new FormData();
-  formData.append('file', image, `${fileName}`);
+  formData.append('file', image, `${name}`);
 
   const metadata = JSON.stringify({
     name
@@ -29,15 +28,18 @@ async function pinFile(image, name) {
       pinata_secret_api_key: 'a7de43296bd643c9795764ae20a3414f326fc602641e22b096b2c535d6b59262'
     }
   });
+
   if (response.status == 200) {
-    const response = await response.json();
-    console.log(`[] ${i}: ${response.IpfsHash}`);
+    const hashResponse = await response.json();
+    console.log(`[] ${hashResponse.IpfsHash}`);
+
+    return hashResponse.IpfsHash;
   } else {
     console.log(await response.text());
     throw new Error(`Pin failed for ${name}`);
   }
 }
-pinFile(fileFromSync(path.join(__dirname, 'download.jpeg')), 'test');
+//pinFile(fileFromSync(path.join(__dirname, 'download.jpeg')), 'test');
 /*for (let i = 0; i < 20; i++) {
   const name = `images-${i * 50000 + 1}-${(i + 1) * 50000}`;
   const dirName = `E:\\chains-images-split\\${name}`;

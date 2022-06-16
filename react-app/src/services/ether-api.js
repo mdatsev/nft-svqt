@@ -1,3 +1,5 @@
+import { pinFile } from './pinata-pinner.js';
+
 const ethers = require('ethers');
 const cache = require('node-cache');
 const keccak256 = require('keccak256');
@@ -108,14 +110,18 @@ export async function connectWallet() {
     return accounts[0];
 }
 
-async function setImage(x, y, image) {
+export async function setImage(x, y, image) {
     await connectWallet();
+
+    const url = await pinFile(image, `${x}.${y}image`);
+    console.log(url);
+    const imageUrl = `ipfs:://${url}/`;
 
     const iface = new ethers.utils.Interface(config.contractABI);
     const params = iface.encodeFunctionData('setImage', [
         ethers.utils.hexlify(x),
         ethers.utils.hexlify(y),
-        image
+        imageUrl
     ]);
 
     const txHash = await window.ethereum.request({
@@ -210,13 +216,14 @@ async function getWorld() {
     for (let i = 0; i < worldSize; i++) {
         tiles.push([]);
         for (let j = 0; j < worldSize; j++) {
-            const link = values[0][i * worldSize + j] ? values[0][i * worldSize + j] : 'images/tile.jpg';
+            const link = values[0][i * worldSize + j] ;//? values[0][i * worldSize + j] ;//: 'images/tile.jpg';
             owners.push(values[1][i * worldSize + j]);
             imageUrls.push(link);
             tiles[i].push({ image: link, owner: values[1][i * worldSize + j] });
         }
     }
 
+    console.log(tiles[0])
     return tiles;
 }
 

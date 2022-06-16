@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { Modal, Button, Header, Icon } from 'semantic-ui-react';
-import { mint } from '../../services/ether-api';
+import { mint, setImage } from '../../services/ether-api';
 import Confetti from 'react-confetti';
 import _ from 'lodash';
 
@@ -82,6 +82,16 @@ const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const [imageFile, setImageFile] = React.useState();
+    const setImageFileWrapper = event => {
+        if (event.target.files && event.target.files[0]) {
+          let img = event.target.files[0];
+          console.log(img);
+          console.log(URL.createObjectURL(img));
+          setImageFile(event.target.files[0]);//URL.createObjectURL(img));      
+        }
+      }
+
     return (
         <>
             {confetti ?
@@ -107,7 +117,7 @@ const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
                             <Button color='red' onClick={() => setModalOpen(false)}>
                                 Close
                             </Button>
-                            <Button color='green' onClick={() => {
+                            <Button color='green' onClick={async () => {
                                 setModalOpen(false);
                                 if(await mint(x, y)) {
                                     setConfetti(true);
@@ -126,15 +136,18 @@ const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
                             <Header content={`Parcel coordinates - x: ${x} y: ${y}`} />
                             <Modal.Content>
                                 <p>
-                                    Welcome to your property!
+                                    Welcome to your property! Choose image for your property!
                                 </p>
+                                <form class="setImage-form">
+                                    <input onChange={setImageFileWrapper} type="file" accept="image/png, image/jpeg"></input>
+                                </form>
                             </Modal.Content>
                             <Modal.Actions>
                                 <Button color='red' onClick={() => setModalOpen(false)}>
                                     Close
                                 </Button>
                                 <Button color='green' onClick={() => {
-                                    //update image here
+                                    setImage(x, y, imageFile)
                                 }}>
                                     Save Changes
                                 </Button>
@@ -163,7 +176,7 @@ const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
             <span onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleOnClick} style={isHovering ? hoveredStyle : unhoveredStyle}>
                 {isNotMinted(x, y) ?
                     <div style={{
-                        backgroundImage: `url(images/tile.jpg)`,
+                        backgroundImage: 'url(images/tile.jpg)',
                         backgroundSize: '80px 80px',
                         backgroundRepeat: 'no-repeat',
                         width: '80px',
@@ -173,7 +186,7 @@ const ParcelBlock = ({ x, y, wallet, parcelInfo, world }) => {
                     }} />
                     :
                     <div style={{
-                        backgroundImage: `${world[x][y].image ? world[x][y].image : 'url(images/tile.jpg)'}`,
+                        backgroundImage: world[x][y].image ? `url(https://gateway.pinata.cloud/ipfs/${world[x][y].image.substring(8)})` : 'url(images/tile.jpg)',
                         backgroundSize: '80px 80px',
                         backgroundRepeat: 'no-repeat',
                         width: '80px',
