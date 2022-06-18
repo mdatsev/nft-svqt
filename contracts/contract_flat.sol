@@ -1752,8 +1752,6 @@ contract Svqt is ERC721Enumerable, Ownable {
     bool public presaleStarted = false;
     address public verifier = 0x5FD6eB55D12E759a21C09eF703fe0CBa1DC9d88D;
 
-    //address paymentSplitter = ;
-
     modifier isWhitelisted(address target, bytes32[] memory proof) {
         (bool success, bytes memory result) = verifier.call(abi.encodeWithSignature("isWhitelisted(address,bytes32[])", msg.sender, proof));
         require(success, "Problem with whitelist verification");
