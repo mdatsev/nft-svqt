@@ -257,8 +257,6 @@ contract Verifier is Ownable {
 
     bytes32 public whitelistRoot;
 
-    //address paymentSplitter = ;
-
     constructor()  { }
 
     function isWhitelisted(address target, bytes32[] memory proof) public view returns(bool) {
